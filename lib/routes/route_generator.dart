@@ -1,4 +1,6 @@
+import 'package:fitness_tracker/bloc/activities/activities_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../ui/home/home_screen.dart';
 import '../ui/splash/splash_screen.dart';
@@ -18,7 +20,10 @@ class RouteGenerator {
       case HomeScreen.route:
         return MaterialPageRoute(
           builder: (context) {
-            return HomeScreen();
+            return BlocProvider<ActivitiesBloc>(
+              create: (context) => ActivitiesBloc(),
+              child: const HomeScreen(),
+            );
           },
         );
       default:

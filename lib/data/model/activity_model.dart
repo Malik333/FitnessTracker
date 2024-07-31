@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fitness_tracker/data/enum/activitiy_type.dart';
+
 class ActivityModel {
   String? title;
   String? description;
-  String? createdAt;
-  String? type;
+  Timestamp? createdAt;
+  ActivityType? type;
   String? duration;
 
   ActivityModel(
@@ -12,7 +15,7 @@ class ActivityModel {
     title = json['title'];
     description = json['description'];
     createdAt = json['created_at'];
-    type = json['type'];
+    type = ActivityType.values.byName(json['type']);
     duration = json['duration'];
   }
 
