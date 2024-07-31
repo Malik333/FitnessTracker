@@ -19,6 +19,22 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
           ],
         ),
-        body: Text("HOME SCREEN"));
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+              child: TextField(
+                onChanged: (text) {
+                },
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                  hintText: 'Search activities...',
+                ),
+              ),
+            ),
+            Text("HOME SCREEN"),
+          ],
+        ));
   }
 }
