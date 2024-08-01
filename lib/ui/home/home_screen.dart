@@ -53,7 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (BuildContext context) {
                 return AddNewActivityModal();
               },
-            );
+            ).then((value) {
+              _bloc.add(FetchActivitiesEvent());
+            });
           },
           backgroundColor: AppColor.primary,
           child: const Icon(Icons.add, color: Colors.white,),

@@ -12,6 +12,10 @@ class ActivitiesLoaded extends ActivitiesState {
   final List<ActivityModel>? activitiesModel;
   ActivitiesLoaded(this.activitiesModel);
 }
+
+class CreatingActivity extends ActivitiesState {}
+class CreatedActivity extends ActivitiesState {}
+
 class ActivitiesError extends ActivitiesState {
   final String error;
   ActivitiesError(this.error);

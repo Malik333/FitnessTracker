@@ -12,15 +12,26 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
 
   ActivitiesBloc() : super(ActivitiesInitial()) {
     on<FetchActivitiesEvent>(loadActivities);
+    on<CreateActivityEvent>(createNewActivity);
 
   }
-
 
   loadActivities(FetchActivitiesEvent event, Emitter<ActivitiesState> emit) async{
     emit(ActivitiesLoading());
     try {
       var data = await _activitiesRepo.getActivities();
       emit(ActivitiesLoaded(data));
+    }catch (e) {
+      print(e);
+      emit(ActivitiesError(e.toString()));
+    }
+  }
+
+  createNewActivity(CreateActivityEvent event, Emitter<ActivitiesState> emit) async{
+    emit(CreatingActivity());
+    try {
+      await _activitiesRepo.createActivity(event.body);
+      emit(CreatedActivity());
     }catch (e) {
       print(e);
       emit(ActivitiesError(e.toString()));

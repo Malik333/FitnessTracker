@@ -18,15 +18,22 @@ class ApiService implements AbstractApiService {
     } on FirebaseException catch (ex) {
       throw FetchDataException(ex.message);
     }
-
-
-
   }
 
   @override
   Future<ActivityModel> getActivity(String collectionName, String documentId) {
     // TODO: implement getActivity
     throw UnimplementedError();
+  }
+
+  @override
+  Future<void> createActivity(String collectionName, ActivityModel bodyModel) async{
+    try {
+      var activities = db.collection(collectionName);
+      await activities.add(bodyModel.toJson());
+    } on FirebaseException catch (ex) {
+      throw FetchDataException(ex.message);
+    }
   }
 
 }

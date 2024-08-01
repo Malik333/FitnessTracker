@@ -4,5 +4,6 @@ abstract class AbstractApiService {
 
   Future<List<ActivityModel>> getActivities(String collectionName);
   Future<ActivityModel> getActivity(String collectionName, String documentId);
+  Future<void> createActivity(String collectionName, ActivityModel bodyModel);
 
 }

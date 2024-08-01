@@ -16,5 +16,13 @@ class ActivitiesRepo {
       rethrow;
     }
   }
+
+  FutureOr<void> createActivity(ActivityModel model) async {
+    try {
+      await _apiService.createActivity(ApiEndpoints.activityCollectionName, model);
+    } catch (e) {
+      rethrow;
+    }
+  }
   //FutureOr<ActivityModel> getActivity() async {}
 }
