@@ -105,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       type: dataModel?[index].type ?? ActivityType.OTHER,
                       createdAt: dataModel?[index].createdAt ?? Timestamp.now(),
                       duration: dataModel?[index].duration ?? '',
+                      docId: dataModel?[index].documentId ?? '',
                     );
                   },
                 ),

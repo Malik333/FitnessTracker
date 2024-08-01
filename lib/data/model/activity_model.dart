@@ -7,16 +7,18 @@ class ActivityModel {
   Timestamp? createdAt;
   ActivityType? type;
   String? duration;
+  String? documentId;
 
   ActivityModel(
       {this.title, this.description, this.createdAt, this.type, this.duration});
 
-  ActivityModel.fromJson(Map<String, dynamic> json) {
+  ActivityModel.fromJson(Map<String, dynamic> json, String docId) {
     title = json['title'];
     description = json['description'];
     createdAt = json['created_at'];
     type = ActivityType.values.byName(json['type']);
     duration = json['duration'];
+    documentId = docId;
   }
 
   Map<String, dynamic> toJson() {

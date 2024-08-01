@@ -17,3 +17,23 @@ class FetchActivitiesSearchEvent extends ActivitiesEvent {
 
   FetchActivitiesSearchEvent(this.query);
 }
+
+class FetchActivityEvent extends ActivitiesEvent {
+  final String id;
+
+  FetchActivityEvent(this.id);
+}
+
+class EditActivityEvent extends ActivitiesEvent {
+  final String id;
+  final ActivityModel body;
+
+  EditActivityEvent(this.id, this.body);
+}
+
+class DeleteActivityEvent extends ActivitiesEvent {
+  final String id;
+
+  DeleteActivityEvent(this.id);
+}
+

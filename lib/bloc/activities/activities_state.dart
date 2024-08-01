@@ -13,6 +13,11 @@ class ActivitiesLoaded extends ActivitiesState {
   ActivitiesLoaded(this.activitiesModel);
 }
 
+class ActivityLoaded extends ActivitiesState {
+  final ActivityModel activityModel;
+  ActivityLoaded(this.activityModel);
+}
+
 class CreatingActivity extends ActivitiesState {}
 class CreatedActivity extends ActivitiesState {}
 

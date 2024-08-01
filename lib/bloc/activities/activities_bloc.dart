@@ -13,7 +13,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   ActivitiesBloc() : super(ActivitiesInitial()) {
     on<FetchActivitiesEvent>(loadActivities);
     on<CreateActivityEvent>(createNewActivity);
-
+    on<EditActivityEvent>(editActivity);
+    on<DeleteActivityEvent>(deleteActivity);
+    on<FetchActivityEvent>(loadActivityData);
   }
 
   loadActivities(FetchActivitiesEvent event, Emitter<ActivitiesState> emit) async{
@@ -27,10 +29,40 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     }
   }
 
+  loadActivityData(FetchActivityEvent event, Emitter<ActivitiesState> emit) async{
+    try {
+      var data = await _activitiesRepo.getActivity(event.id);
+      emit(ActivityLoaded(data));
+    }catch (e) {
+      print(e);
+      emit(ActivitiesError(e.toString()));
+    }
+  }
+
   createNewActivity(CreateActivityEvent event, Emitter<ActivitiesState> emit) async{
     emit(CreatingActivity());
     try {
       await _activitiesRepo.createActivity(event.body);
+      emit(CreatedActivity());
+    }catch (e) {
+      print(e);
+      emit(ActivitiesError(e.toString()));
+    }
+  }
+
+  deleteActivity(DeleteActivityEvent event, Emitter<ActivitiesState> emit) async{
+    try {
+      await _activitiesRepo.deleteActivity(event.id);
+      add(FetchActivitiesEvent());
+    }catch (e) {
+      print(e);
+      emit(ActivitiesError(e.toString()));
+    }
+  }
+
+  editActivity(EditActivityEvent event, Emitter<ActivitiesState> emit) async{
+    try {
+      await _activitiesRepo.editActivity(event.id, event.body);
       emit(CreatedActivity());
     }catch (e) {
       print(e);

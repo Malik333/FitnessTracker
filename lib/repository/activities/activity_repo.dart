@@ -17,6 +17,15 @@ class ActivitiesRepo {
     }
   }
 
+  FutureOr<ActivityModel> getActivity(String documentId) async {
+    try {
+      ActivityModel response = await _apiService.getActivity(ApiEndpoints.activityCollectionName, documentId);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   FutureOr<void> createActivity(ActivityModel model) async {
     try {
       await _apiService.createActivity(ApiEndpoints.activityCollectionName, model);
@@ -24,5 +33,21 @@ class ActivitiesRepo {
       rethrow;
     }
   }
-  //FutureOr<ActivityModel> getActivity() async {}
+
+  FutureOr<void> deleteActivity(String documentId) async {
+    try {
+      await _apiService.deleteActivity(ApiEndpoints.activityCollectionName, documentId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  FutureOr<void> editActivity(String documentId, ActivityModel model) async {
+    try {
+      await _apiService.editActivity(ApiEndpoints.activityCollectionName, documentId, model);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 }

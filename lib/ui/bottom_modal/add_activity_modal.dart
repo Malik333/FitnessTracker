@@ -13,6 +13,12 @@ import 'package:intl/intl.dart';
 import '../../bloc/activities/activities_state.dart';
 
 class AddNewActivityModal extends StatefulWidget {
+  final String? docId;
+  final bool isEditing;
+
+
+  const AddNewActivityModal({super.key, this.docId, this.isEditing = false});
+
   @override
   State<AddNewActivityModal> createState() => _AddNewActivityModalState();
 }
@@ -35,40 +41,37 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
   ///Date
   DateTime selected = DateTime.now();
   DateTime initial = DateTime(2000);
-  DateTime last = DateTime(2025);
+  DateTime last = DateTime(2045);
 
   ///Time
   TimeOfDay timeOfDay = TimeOfDay.now();
 
   bool isEmpty = true;
   bool isCreating = false;
+  bool isInitialized = false;
 
   ActivityType activityType = ActivityType.RUN;
 
-  Future displayDatePicker(BuildContext context) async {
-    var date = await showDatePicker(
-      context: context,
-      initialDate: selected,
-      firstDate: initial,
-      lastDate: last,
-    );
+  late ActivitiesBloc activityBloc;
 
-    if (date != null) {
-      setState(() {
-        _dateController.text = date.toLocal().toString().split(" ")[0];
-      });
-    }
+  void displayData(ActivityModel model) {
+    if (isInitialized) return;
+
+    _titleController.text = model.title!;
+    _descController.text = model.description!;
+    _durationController.text = model.duration!;
+    activityType = model.type!;
+
+    var dateTime = model.createdAt!.toDate();
+    _dateController.text = dateTime.toLocal().toString().split(" ")[0];
+    _timeController.text = '${dateTime.hour}:${dateTime.minute}';
+
+    selected = dateTime;
+    timeOfDay = TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+
+    isInitialized = true;
   }
 
-  Future displayTimePicker(BuildContext context) async {
-    var time = await showTimePicker(context: context, initialTime: timeOfDay);
-
-    if (time != null) {
-      setState(() {
-        _timeController.text = "${time.hour}:${time.minute}";
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +82,12 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
   }
 
   Widget buildPage(BuildContext context) {
-    final activityBloc = BlocProvider.of<ActivitiesBloc>(context);
+
+    activityBloc = BlocProvider.of<ActivitiesBloc>(context);
+
+    if (widget.isEditing && !isInitialized) {
+      activityBloc.add(FetchActivityEvent(widget.docId!));
+    }
 
     return Container(
       color: Colors.white,
@@ -104,6 +112,10 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
             Navigator.of(context).pop();
           }
 
+          if (state is ActivityLoaded) {
+            displayData(state.activityModel);
+          }
+
           return Column(
             children: [
               Container(
@@ -125,7 +137,7 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
-                          'Add new activity'.toUpperCase(),
+                          widget.isEditing ? 'Update activity'.toUpperCase() : 'Add new activity'.toUpperCase(),
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w700),
                           textAlign: TextAlign.center,
@@ -328,19 +340,26 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
                               _formKeyDuration.currentState!.validate();
 
                               if (!isEmpty) {
+                                DateFormat inputFormat = DateFormat('yyyy-MM-dd hh:mm:ss');
+                                var dateTimeSelected = "${_dateController.text} ${_timeController.text}:00";
+                                var date = inputFormat.parse(dateTimeSelected);
                                 var body = ActivityModel(
                                   title: _titleController.text,
                                   description: _descController.text,
-                                  createdAt: Timestamp.fromDate(DateTime.parse(DateFormat("yyyy-MM-dd hh:mm:ss").format(DateTime.parse('${_dateController.text} ${_timeController.text}')))),
+                                  createdAt: Timestamp.fromDate(date),
                                   type: activityType,
                                   duration: _durationController.text
                                 );
 
-                                activityBloc.add(CreateActivityEvent(body));
+                                if (widget.isEditing) {
+                                  activityBloc.add(EditActivityEvent(widget.docId!, body));
+                                } else {
+                                  activityBloc.add(CreateActivityEvent(body));
+                                }
                               }
                             },
                             child: Text(
-                              'Create'.toUpperCase(),
+                              widget.isEditing ? 'Save'.toUpperCase() : 'Create'.toUpperCase(),
                               style:
                               const TextStyle(color: Colors.white, fontSize: 18),
                             ),
@@ -357,5 +376,30 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
         },
       ),
     );
+  }
+
+  Future displayDatePicker(BuildContext context) async {
+    var date = await showDatePicker(
+      context: context,
+      initialDate: selected,
+      firstDate: initial,
+      lastDate: last,
+    );
+
+    if (date != null) {
+      setState(() {
+        _dateController.text = date.toLocal().toString().split(" ")[0];
+      });
+    }
+  }
+
+  Future displayTimePicker(BuildContext context) async {
+    var time = await showTimePicker(context: context, initialTime: timeOfDay);
+
+    if (time != null) {
+      setState(() {
+        _timeController.text = "${time.hour}:${time.minute}";
+      });
+    }
   }
 }
