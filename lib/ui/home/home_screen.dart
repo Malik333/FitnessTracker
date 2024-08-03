@@ -31,6 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late final ActivitiesBloc _bloc;
   late final UserGoalsModel? goalsModel;
 
+  DateTime? filterSelectedDate;
+  ActivityType? filterSelectedType;
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white,),
+              icon: const Icon(
+                Icons.settings,
+                color: Colors.white,
+              ),
               onPressed: () {
                 showModalBottomSheet<void>(
                   shape: const RoundedRectangleBorder(
@@ -132,10 +138,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           isScrollControlled: true,
                           context: context,
                           builder: (BuildContext context) {
-                            return FiltersActivityModal();
+                            return FiltersActivityModal(
+                              selectedDate: filterSelectedDate,
+                              selectedType: filterSelectedType,
+                            );
                           },
                         ).then<FilterActivityModel?>((value) {
-                          _bloc.add(FetchActivitiesFilterEvent(value!));
+                          if (value != null) {
+                            filterSelectedDate = value.date?.toDate();
+                            filterSelectedType = value.type;
+                            _bloc.add(FetchActivitiesFilterEvent(value));
+                          }
                         });
                       },
                     )),

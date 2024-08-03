@@ -57,11 +57,18 @@ class ApiService implements AbstractApiService {
       QuerySnapshot<Map<String, dynamic>>? query;
 
       if (model.date != null && model.type != null) {
-        query = await activities.where("created_at", isEqualTo: model.date).where("type", isEqualTo: typeName(model.type!)).get();
-      } else if (model.type == null && model.date != null) {
-        query = await activities.where("created_at", isEqualTo: model.date).get();
-      } else if (model.type != null && model.date == null) {
+        var tmrv = model.date!.toDate().add(const Duration(days: 1));
+        final Timestamp tomorrow = Timestamp.fromDate(
+          DateTime(tmrv.year, tmrv.month, tmrv.day),
+        );
+
+        query = await activities.where("created_at",
+            isGreaterThan: model.date, isLessThan: tomorrow).where("type", isEqualTo: typeName(model.type!)).get();
+      }
+      else if (model.type != null) {
         query = await activities.where("type", isEqualTo: typeName(model.type!)).get();
+      } else {
+        query = await activities.get();
       }
 
       return query!.docs.map((e) {

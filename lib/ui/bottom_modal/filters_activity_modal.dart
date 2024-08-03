@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitness_tracker/bloc/activities/activities_bloc.dart';
 import 'package:fitness_tracker/bloc/activities/activities_event.dart';
@@ -14,7 +16,9 @@ import 'package:intl/intl.dart';
 import '../../bloc/activities/activities_state.dart';
 
 class FiltersActivityModal extends StatefulWidget {
-  const FiltersActivityModal({super.key});
+  final DateTime? selectedDate;
+  final ActivityType? selectedType;
+  const FiltersActivityModal({super.key, this.selectedDate, this.selectedType});
 
   @override
   State<FiltersActivityModal> createState() => _FiltersActivityModalState();
@@ -37,19 +41,30 @@ class _FiltersActivityModalState extends State<FiltersActivityModal> {
 
   ActivityType activityType = ActivityType.RUN;
 
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.selectedDate != null) {
+      initial = widget.selectedDate!;
+      selected = widget.selectedDate;
+      _dateController.text = widget.selectedDate!.toLocal().toString().split(" ")[0];
+    }
+
+    if (widget.selectedType != null) {
+      activityType = widget.selectedType!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  buildPage(context);
+    return buildPage(context);
   }
 
   Widget buildPage(BuildContext context) {
-
     return Container(
         color: Colors.white,
-        height: MediaQuery
-            .sizeOf(context)
-            .height * 0.8,
+        height: MediaQuery.sizeOf(context).height * 0.8,
         child: Column(
           children: [
             Container(
@@ -70,13 +85,24 @@ class _FiltersActivityModalState extends State<FiltersActivityModal> {
                     const Spacer(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text('Filters activity'.toUpperCase(),
+                      child: Text(
+                        'Filters activity'.toUpperCase(),
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700),
                         textAlign: TextAlign.center,
                       ),
                     ),
                     const Spacer(),
+                    InkWell(
+                        onTap: () {
+                          var filters = FilterActivityModel();
+
+                          Navigator.of(context).pop(filters);
+                        },
+                        child: const Text(
+                          "Clear all",
+                          style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline, decorationColor: Colors.blue),
+                        ))
                   ],
                 ),
               ),
@@ -108,12 +134,14 @@ class _FiltersActivityModalState extends State<FiltersActivityModal> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10,),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       FormField(builder: (state) {
                         return Container(
                           decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(4.0)),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(4.0)),
                               border: Border.all()),
                           width: double.infinity,
                           child: DropdownButtonHideUnderline(
@@ -134,19 +162,20 @@ class _FiltersActivityModalState extends State<FiltersActivityModal> {
                               items: ActivityType.values
                                   .map<DropdownMenuItem<ActivityType>>(
                                       (ActivityType value) {
-                                    return DropdownMenuItem<ActivityType>(
-                                      value: value,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(typeName(value),
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
+                                return DropdownMenuItem<ActivityType>(
+                                  value: value,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      typeName(value),
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ),
                         );
@@ -173,30 +202,27 @@ class _FiltersActivityModalState extends State<FiltersActivityModal> {
                             }
 
                             var filters = FilterActivityModel(
-                              date: selectedDate,
-                              type: activityType
-                            );
+                                date: selectedDate, type: activityType);
 
                             Navigator.of(context).pop(filters);
                           },
-                          child: Text('Filter'.toUpperCase(),
-                            style:
-                            const TextStyle(color: Colors.white, fontSize: 18),
+                          child: Text(
+                            'Filter'.toUpperCase(),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 18),
                           ),
                         ),
                       ),
-                      Padding(padding: EdgeInsets.only(bottom: MediaQuery
-                          .of(context)
-                          .viewInsets
-                          .bottom))
+                      Padding(
+                          padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom))
                     ],
                   ),
                 ),
               ),
             )
           ],
-        )
-    );
+        ));
   }
 
   Future displayDatePicker(BuildContext context) async {
