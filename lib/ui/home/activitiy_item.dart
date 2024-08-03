@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitness_tracker/bloc/activities/activities_event.dart';
+import 'package:fitness_tracker/data/model/user_goals_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class ActivityItem extends StatefulWidget {
   final ActivityType? type;
   final String? duration;
   final String? docId;
+  final UserGoalsModel? userGoalsModel;
 
   const ActivityItem(
       {super.key,
@@ -26,7 +28,8 @@ class ActivityItem extends StatefulWidget {
       this.createdAt,
       this.type,
       this.duration,
-      this.docId});
+      this.docId,
+      this.userGoalsModel});
 
   @override
   State<ActivityItem> createState() => _ActivityItemState();
@@ -48,102 +51,134 @@ class _ActivityItemState extends State<ActivityItem> {
         surfaceTintColor: Colors.white,
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.title ?? '',
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(
-                      height: 2,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.access_time_outlined,
-                          size: 10,
-                        ),
-                        const SizedBox(
-                          width: 4,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              DateFormat("dd.MM.yyyy hh:mm")
-                                  .format(widget.createdAt!.toDate()),
-                              style: const TextStyle(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.title ?? '',
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(
+                            height: 2,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.access_time_outlined,
+                                size: 10,
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    DateFormat("dd.MM.yyyy hh:mm")
+                                        .format(widget.createdAt!.toDate()),
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            widget.description!,
+                            maxLines: 2,
+                            style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                              ),
+                                fontWeight: FontWeight.w500),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              typeName(widget.type!),
+                              style: TextStyle(
+                                  color: getTextColor(),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(
+                              height: 2,
+                            ),
+                            Text(
+                              '${widget.duration ?? ' '} min',
+                              style: TextStyle(
+                                  color: getTextColor(),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ],
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      widget.description!,
-                      maxLines: 2,
-                      style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
+                        ),
+                      )),
+                ],
               ),
             ),
-            Expanded(
-                child: Column(
-              children: [
-                Text(
-                  typeName(widget.type!),
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(
-                  height: 2,
-                ),
-                Text(
-                  '${widget.duration ?? ' '} min',
-                  style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600),
-                ),
-              ],
-            )),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                GestureDetector(
-                  child: Icon(Icons.more_horiz_rounded),
-                  onTapUp: (details) {
-                    _showPopupMenu(context, details.globalPosition);
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    child: Icon(Icons.more_horiz_rounded),
+                    onTapUp: (details) {
+                      _showPopupMenu(context, details.globalPosition);
+                    },
+                  ),
                 )
               ],
             )
           ],
         ));
+  }
+
+  Color getTextColor() {
+    if (widget.userGoalsModel != null) {
+      var duration = widget.userGoalsModel!.minutes!;
+      var quantity = widget.userGoalsModel!.quantity!;
+
+      var totalDuration = duration * quantity;
+
+      if (int.parse(widget.duration!) > totalDuration) {
+        return Colors.green;
+      } else {
+        return Colors.red;
+      }
+    }
+
+    return Colors.black;
   }
 
   void _showPopupMenu(BuildContext context, Offset offset) async {
@@ -158,23 +193,30 @@ class _ActivityItemState extends State<ActivityItem> {
           end: left + 2,
           bottom: top + 2),
       items: [
-        PopupMenuItem<String>(child: const Text('Edit'), value: 'Edit', onTap: () {
-          showModalBottomSheet<void>(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20),
+        PopupMenuItem<String>(
+          child: const Text('Edit'),
+          value: 'Edit',
+          onTap: () {
+            showModalBottomSheet<void>(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
-            ),
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            isScrollControlled: true,
-            context: context,
-            builder: (BuildContext context) {
-              return AddNewActivityModal(docId: widget.docId, isEditing: true,);
-            },
-          ).then((value) {
-            _bloc.add(FetchActivitiesEvent());
-          });
-        },),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              isScrollControlled: true,
+              context: context,
+              builder: (BuildContext context) {
+                return AddNewActivityModal(
+                  docId: widget.docId,
+                  isEditing: true,
+                );
+              },
+            ).then((value) {
+              _bloc.add(FetchActivitiesEvent());
+            });
+          },
+        ),
         PopupMenuItem<String>(
           child: Text(
             'Delete',
@@ -182,7 +224,7 @@ class _ActivityItemState extends State<ActivityItem> {
           ),
           value: 'Delete',
           onTap: () {
-           showAlertDialog(context);
+            showAlertDialog(context);
           },
         ),
       ],
@@ -208,9 +250,11 @@ class _ActivityItemState extends State<ActivityItem> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text("Delete", style: TextStyle(color: Colors.red),),
-      content: const Text(
-          "Are you sure you want to delete?"),
+      title: const Text(
+        "Delete",
+        style: TextStyle(color: Colors.red),
+      ),
+      content: const Text("Are you sure you want to delete?"),
       actions: [
         cancelButton,
         continueButton,

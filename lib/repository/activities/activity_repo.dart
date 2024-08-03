@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:fitness_tracker/data/model/filter_activity_model.dart';
+
 import '../../data/model/activity_model.dart';
 import '../../data/remote/abstract_api_service.dart';
 import '../../data/remote/api_endpoints.dart';
@@ -20,6 +22,24 @@ class ActivitiesRepo {
   FutureOr<ActivityModel> getActivity(String documentId) async {
     try {
       ActivityModel response = await _apiService.getActivity(ApiEndpoints.activityCollectionName, documentId);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  FutureOr<List<ActivityModel>?> searchActivities(String query) async {
+    try {
+      List<ActivityModel> response = await _apiService.searchActivities(ApiEndpoints.activityCollectionName, query);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  FutureOr<List<ActivityModel>?> filtersActivities(FilterActivityModel filterActivityModel) async {
+    try {
+      List<ActivityModel> response = await _apiService.filtersActivities(ApiEndpoints.activityCollectionName, filterActivityModel);
       return response;
     } catch (e) {
       rethrow;

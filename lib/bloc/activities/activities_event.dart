@@ -1,4 +1,5 @@
 import 'package:fitness_tracker/data/model/activity_model.dart';
+import 'package:fitness_tracker/data/model/filter_activity_model.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -16,6 +17,12 @@ class FetchActivitiesSearchEvent extends ActivitiesEvent {
   final String query;
 
   FetchActivitiesSearchEvent(this.query);
+}
+
+class FetchActivitiesFilterEvent extends ActivitiesEvent {
+  final FilterActivityModel filterActivityModel;
+
+  FetchActivitiesFilterEvent(this.filterActivityModel);
 }
 
 class FetchActivityEvent extends ActivitiesEvent {
