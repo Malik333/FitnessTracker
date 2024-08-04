@@ -15,7 +15,7 @@ class ApiService implements AbstractApiService {
   Future<List<ActivityModel>> getActivities(String collectionName) async {
     try {
       var activities = db.collection(collectionName);
-      var data = await activities.get();
+      var data = await activities.orderBy("created_at", descending: true).get();
       return data.docs.map((e) {
         return ActivityModel.fromJson(e.data(), e.id);
       }).toList();
@@ -41,7 +41,7 @@ class ApiService implements AbstractApiService {
    try {
      var activities = db.collection(collectionName);
      var data = await activities.where("title", isGreaterThanOrEqualTo: text, isLessThan: text.isEmpty ? null : text.substring(0, text.length - 1) + String.fromCharCode(text.codeUnitAt(text.length - 1) + 1))
-         .where("description", isGreaterThanOrEqualTo: text, isLessThan: text.isEmpty ? null : text.substring(0, text.length - 1) + String.fromCharCode(text.codeUnitAt(text.length - 1) + 1)).get();
+         .where("description", isGreaterThanOrEqualTo: text, isLessThan: text.isEmpty ? null : text.substring(0, text.length - 1) + String.fromCharCode(text.codeUnitAt(text.length - 1) + 1)).orderBy("created_at", descending: true).get();
      return data.docs.map((e) {
        return ActivityModel.fromJson(e.data(), e.id);
      }).toList();
@@ -63,10 +63,10 @@ class ApiService implements AbstractApiService {
         );
 
         query = await activities.where("created_at",
-            isGreaterThan: model.date, isLessThan: tomorrow).where("type", isEqualTo: typeName(model.type!)).get();
+            isGreaterThan: model.date, isLessThan: tomorrow).where("type", isEqualTo: typeName(model.type!)).orderBy("created_at", descending: true).get();
       }
       else if (model.type != null) {
-        query = await activities.where("type", isEqualTo: typeName(model.type!)).get();
+        query = await activities.where("type", isEqualTo: typeName(model.type!)).orderBy("created_at", descending: true).get();
       } else {
         query = await activities.get();
       }

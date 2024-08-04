@@ -109,7 +109,9 @@ class _AddNewActivityModalState extends State<AddNewActivityModal> {
           }
 
           if (state is CreatedActivity) {
-            Navigator.of(context).pop();
+            WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
+              Navigator.of(context).pop();
+            });
           }
 
           if (state is ActivityLoaded) {
